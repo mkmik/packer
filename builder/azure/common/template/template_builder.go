@@ -7,6 +7,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/arm/compute"
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/hashicorp/packer/builder/azure/common"
 )
 
 const (
@@ -21,6 +22,7 @@ const (
 	resourceVirtualNetworks   = "Microsoft.Network/virtualNetworks"
 
 	variableSshKeyPath = "sshKeyPath"
+	tempNameAlphabet   = "0123456789bcdfghjklmnpqrstvwxyz"
 )
 
 type TemplateBuilder struct {
@@ -111,7 +113,8 @@ func (s *TemplateBuilder) SetManagedDiskUrl(managedImageId string, storageAccoun
 	profile.ImageReference = &compute.ImageReference{
 		ID: &managedImageId,
 	}
-	profile.OsDisk.Name = to.StringPtr("osdisk")
+	tmp := common.RandomString(tempNameAlphabet, 10)
+	profile.OsDisk.Name = to.StringPtr(fmt.Sprintf("osdisk-%s", tmp))
 	profile.OsDisk.OsType = s.osType
 	profile.OsDisk.CreateOption = compute.FromImage
 	profile.OsDisk.Vhd = nil
@@ -136,7 +139,8 @@ func (s *TemplateBuilder) SetManagedMarketplaceImage(location, publisher, offer,
 		Version:   &version,
 		//ID:        &imageID,
 	}
-	profile.OsDisk.Name = to.StringPtr("osdisk")
+	tmp := common.RandomString(tempNameAlphabet, 10)
+	profile.OsDisk.Name = to.StringPtr(fmt.Sprintf("osdisk-%s", tmp))
 	profile.OsDisk.OsType = s.osType
 	profile.OsDisk.CreateOption = compute.FromImage
 	profile.OsDisk.Vhd = nil
